@@ -125,14 +125,14 @@ export function* openImageSteps(image: Buffer): Generator<void, NativeImage> {
       );
   } catch (cause) {
     if (cause instanceof ElfPointerRelocationFailure) {
+      if (cause.failure.kind === "limit")
+        throw new Il2cppBinaryFormatFailure(
+          "native-index-capacity",
+          cause.message,
+          cause.failure.limit.maximum,
+        );
       if (cause.reason !== "native-index-capacity")
         throw new Il2cppBinaryFormatFailure(cause.reason, cause.message);
-      if (cause.maximum !== undefined)
-        throw new Il2cppBinaryFormatFailure(
-          cause.reason,
-          cause.message,
-          cause.maximum,
-        );
     }
     if (cause instanceof BinaryFormatFailure)
       throw new Il2cppBinaryFormatFailure("malformed-container", cause.message);
